@@ -1,0 +1,114 @@
+#state
+
+
+  create table state(stateid number(3) primary key,statename varchar2(15) not null,adminid number(2) references admin);
+
+   create sequence seq_state start with 1 increment by 1;
+
+#admin
+
+create table admin(adminid number(2) primary key,emailid varchar2(25),password varchar2(10),firstname varchar2(10),middlename varchar2(10),lastname varchar2(10),address varchar2(100));
+
+
+create sequence seq_admin start with 1 increment by 1;  
+
+#feedback
+
+
+create table feedback(feedbackid number(5) primary key,emailid varchar2(25),msg varchar2(50));
+
+create sequence seq_feedback start with 1 increment by 1;
+
+#events
+
+
+create table events(eventid number(5) primary key,eventname varchar2(15),eventinfo varchar2(100),eventprice number(4),adminid number(2) references admin);
+
+create sequence seq_events start with 1 increment by 1;
+
+#news
+
+
+create table news(newsid number(3) primary key,newstitle varchar2(25),datecreated date,validity number(3),adminid references admin);
+
+create sequence seq_news start with 1 increment by 1;
+
+
+#city
+
+
+
+create table city(cityid number(3) primary key,cityname varchar2(20),stateid number(3) references state,adminid number(2) references admin);
+create sequence seq_city start with 1 increment by 1;
+
+#userdetails
+
+
+create table userdetails(userid number(10) primary key,name varchar2(20),email varchar2(30),password varchar2(10),gender varchar2(6),mobilenumber number(10),cityid number(3) references city);
+
+create sequence seq_userdetails start with 1 increment by 1;
+
+#cinema
+
+create table cinema(cinemaid number(3) primary key,cinemaname varchar2(30),cityid number(3) references city,adminid number(2) references admin);
+create sequence seq_cinema start with 1 increment by 1;
+
+#branch
+
+
+create table branch(branchid number(3) primary key,branchname varchar2(30),branchaddress varchar2(50),cinemaid number(3) references cinema,adminid number(2) references admin);
+
+create sequence seq_branch start with 1 increment by 1;
+
+
+#moviebranch
+
+create table moviebranch(moviebranchid number(3) primary key,movieid number(3) references movie,branchid number(3) references branch,adminid number(2) references admin);
+create sequence seq_moviebranch start with 1 increment by 1;
+
+#language
+
+create table language(languageid number(2) primary key,languagename varchar2(20) unique,adminid number(2) references admin);
+create sequence seq_language start with 1 increment by 1;
+
+select lg.languageid,lg.languagename,ad.firstname,ad.lastname from language lg,admin ad where lg.adminid=ad.adminid;
+
+
+#movielanguage
+
+create table movielanguage(movielanguageid number(3) primary key,movieid number(3) references movie,languageid number(2) references language,adminid number(2) references admin);
+
+create sequence seq_movielanguage start with 1 increment by 1;
+
+#show
+ ALTER SESSION SET nls_date_format = 'DD/MM/YYYY HH24:MI:SS';
+create table show(showid number(5) primary key,showdate varchar2(20),moviebranchid number(3) references moviebranch,adminid number(2) references admin);
+
+create sequence seq_show start with 1 increment by 1;
+
+#screen
+
+create table screen(screenid number(5) primary key,screenno varchar2(2),showid number(5) references show,adminid number(2) references admin);
+
+create sequence seq_screen start with 1 increment by 1;
+
+#movie
+
+create table movie(movieid number(5) primary key,moviename varchar2(30),director varchar2(30),writer varchar2(30),music varchar2(30),releasedate varchar2(10),enddate varchar2(10),adminid number(2) references admin);
+create sequence seq_movie start with 1 increment by 1;
+
+#seat
+
+create table seat(seatid number(5) primary key,seatno number(3),screenid number(5) references screen,adminid number(2) references admin);
+create sequence seq_seat start with 1 increment by 1;
+
+select se.seatid,se.seatno,se.screenid,se.adminid,ad.firstname,ad.lastname,sc.screenno,sh.showdate,mv.moviename,br.branchname,cn.cinemaname,ct.cityname,st.statename from seat se,screen sc,show sh,moviebranch mb,movie mv,branch br,cinema cn,city ct,state st,admin ad where se.adminid=ad.adminid and se.screenid=sc.screenid and sc.showid=sh.showid and sh.moviebranchid=mb.moviebranchid and mb.movieid=mv.movieid and mb.branchid=br.branchid and br.cinemaid=cn.cinemaid and cn.cityid=ct.cityid and ct.stateid=st.stateid;
+
+
+#payment
+create table payment(paymentid number(3) primary key,paymenttype varchar2(20),adminid number(2) references admin);
+create sequence seq_payment start with 1 increment by 1;
+
+
+
+
